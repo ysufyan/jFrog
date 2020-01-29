@@ -7,8 +7,6 @@ pipeline {
                 echo 'In Build step: Building...'
                 sh """#!/bin/bash
                     set -e
-                    export NEXUSUSER=`cat /tmp/nexususerpass/nexusUser`
-                    export NEXUSPASSWORD=`cat /tmp/nexususerpass/nexusPassword`
                     ./gradlew build
                     ./gradlew war
                 """
