@@ -34,9 +34,9 @@ API Response:
 ]
 
 Technology Stack:
-- Jakarta EE 9
+- Jakarta EE 8
 - JDK 11
-- Wildfly Application server
+- Wildfly Application server. 18.0.1
 - Eclipse IDE. 2019-12 R
-- JAX-RS
+- JAX-RS. RestEasy 4.4.1.Final
 - Postman
