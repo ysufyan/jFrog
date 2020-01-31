@@ -15,11 +15,14 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'In Test step. Testing...'
+                sh './gradlew check'
             }
         }
         stage('Deploy') {
             steps {
                 echo 'In Deploy step. Deploying....'
+                // Configure Wildflu plugin to deploy war file.
+                sh "jboss-cli.sh --connect --command='deploy target/your.war --force'"
             }
         }
     }
@@ -39,6 +42,7 @@ pipeline {
     failure {
        emailext (
           to: 'yasirsufyan@gmail.com ysufyan@yahoo.com',
+          
           subject: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
           body: """FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':
             Check console output at ${env.BUILD_URL}consoleFull """,
