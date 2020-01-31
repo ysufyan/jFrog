@@ -10,7 +10,7 @@ public interface ArtifactoryService {
 
 	public ArtifactSearchDTO searchAllArtifacts(final String repo);
 
-	public ArtifactStatsDTO findArtifactStats(final String artifactPath);
+	public ArtifactStatsDTO findArtifactStats(final ArtifactDTO artifactPath);
 
 	public Map<String, ArtifactDTO> findTwoMostlyDownloadedArtifacts(final String repo);
 

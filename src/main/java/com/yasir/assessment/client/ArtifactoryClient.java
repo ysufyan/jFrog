@@ -1,24 +1,57 @@
 package com.yasir.assessment.client;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Properties;
+
+import javax.ejb.Stateless;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 
 import com.google.gson.Gson;
+import com.yasir.assessment.service.dto.ArtifactDTO;
 import com.yasir.assessment.service.dto.ArtifactSearchDTO;
 import com.yasir.assessment.service.dto.ArtifactStatsDTO;
 
+@Stateless
 public class ArtifactoryClient {
+
+	static String SEARCH_URL;
+	static String STATS_URL;
+	private static String authHeader;
+
+	static {
+		InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("application.properties");
+		Properties properties = new Properties();
+		try {
+			properties.load(is);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		SEARCH_URL = properties.getProperty("SEARCH_URL");
+		STATS_URL = properties.getProperty("STATS_URL");
+
+		try {
+			authHeader = (String) new InitialContext().lookup("java:global/auth");
+		} catch (NamingException e) {
+			e.printStackTrace();
+		}
+
+	}
 
 	public ArtifactSearchDTO searchAllArtifacts(final String repo) {
 
 		ArtifactSearchDTO searchResult = null;
 		try {
-			HttpRequest request = HttpRequest.newBuilder().uri(new URI("http://35.238.219.235/artifactory/api/search/aql"))
-					.headers("Content-Type", "text/plain;charset=UTF-8").headers("Authorization", "Basic YWRtaW46a2o5U081emdaVQ==")
+			HttpRequest request = HttpRequest.newBuilder().uri(new URI(SEARCH_URL)).headers(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+					.headers(HttpHeaders.AUTHORIZATION, authHeader).headers(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
 					.POST(HttpRequest.BodyPublishers.ofString("items.find({\"repo\":{\"$eq\":\"jcenter-cache\"}})")).build();
 
 			HttpResponse<String> response = HttpClient.newBuilder().build().send(request, HttpResponse.BodyHandlers.ofString());
@@ -37,11 +70,13 @@ public class ArtifactoryClient {
 
 	}
 
-	public ArtifactStatsDTO findArtifactStats(final String artifactPath) {
+	public ArtifactStatsDTO findArtifactStats(final ArtifactDTO artifact) {
 		ArtifactStatsDTO artifactStatsDTO = null;
+
+		String artifactStatPath = STATS_URL + artifact.getRepo() + "/" + artifact.getPath() + "/" + artifact.getName() + "?stats";
 		try {
-			HttpRequest request = HttpRequest.newBuilder().uri(new URI(artifactPath))
-					.headers("Authorization", "Basic YWRtaW46a2o5U081emdaVQ==").GET().build();
+			HttpRequest request = HttpRequest.newBuilder().uri(new URI(artifactStatPath)).headers(HttpHeaders.AUTHORIZATION, authHeader)
+					.headers(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON).GET().build();
 			HttpResponse<String> response = HttpClient.newBuilder().build().send(request, HttpResponse.BodyHandlers.ofString());
 
 			Gson gson = new Gson();

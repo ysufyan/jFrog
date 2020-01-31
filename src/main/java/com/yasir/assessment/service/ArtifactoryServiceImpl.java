@@ -1,8 +1,10 @@
 package com.yasir.assessment.service;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.ejb.Stateless;
 
@@ -22,10 +24,10 @@ public class ArtifactoryServiceImpl implements ArtifactoryService {
 
 	}
 
-	public ArtifactStatsDTO findArtifactStats(final String artifactPath) {
+	public ArtifactStatsDTO findArtifactStats(final ArtifactDTO artifact) {
 
 		ArtifactoryClient client = new ArtifactoryClient();
-		ArtifactStatsDTO artifactStatsDTO = client.findArtifactStats(artifactPath);
+		ArtifactStatsDTO artifactStatsDTO = client.findArtifactStats(artifact);
 		return artifactStatsDTO;
 	}
 
@@ -38,8 +40,7 @@ public class ArtifactoryServiceImpl implements ArtifactoryService {
 		List<ArtifactDTO> artifacts = searchResult.getArtifacts();
 
 		for (ArtifactDTO artifact : artifacts) {
-			ArtifactStatsDTO artifactStatsDTO = findArtifactStats("http://35.238.219.235/artifactory/api/storage/" + artifact.getRepo()
-					+ "/" + artifact.getPath() + "/" + artifact.getName() + "?stats");
+			ArtifactStatsDTO artifactStatsDTO = findArtifactStats(artifact);
 			if (artifactStatsDTO.getDownloadCount() > maxDownloaded) {
 				maxDownloaded = artifactStatsDTO.getDownloadCount();
 				twoMostlyDownloadedArtifacts.put("first", artifact);
@@ -53,6 +54,15 @@ public class ArtifactoryServiceImpl implements ArtifactoryService {
 
 		return twoMostlyDownloadedArtifacts;
 
+	}
+	
+	public static void main(String[] args) throws Exception{
+		InputStream is =  Thread.currentThread().getContextClassLoader().getResourceAsStream("application.properties");
+		Properties properties = new Properties();
+		properties.load(is);
+		String p = properties.getProperty("SEARCH_URL");
+		String l = properties.getProperty("STATS_URL");
+		System.out.println("P: " + p + " l: " + l);
 	}
 
 }
