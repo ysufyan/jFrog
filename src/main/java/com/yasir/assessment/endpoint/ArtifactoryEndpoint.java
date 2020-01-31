@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ejb.EJB;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -27,12 +28,15 @@ public class ArtifactoryEndpoint {
 
 	@GET
 	@Path("/two-mostly-downloaded")
-	public List<ArtifactDTO> findTwoMostlyDownloadedArtifacts(@QueryParam("repo") final String repo) {
+	public List<ArtifactDTO> findTwoMostlyDownloadedArtifacts(final @NotNull @QueryParam("repo") String repo) {
 		Map<String, ArtifactDTO> twoMostlyDownloadedArtifacts = artifactoryService
 				.findTwoMostlyDownloadedArtifacts(repo);
 		List<ArtifactDTO> returnValue = new ArrayList<ArtifactDTO>();
 		returnValue.add(twoMostlyDownloadedArtifacts.get("first"));
 		returnValue.add(twoMostlyDownloadedArtifacts.get("second"));
+		
+		LOGGER.debug("/two-mostly-downloaded invoked");
+		
 		return returnValue;
 	}
 

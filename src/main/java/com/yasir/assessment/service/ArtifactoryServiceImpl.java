@@ -55,14 +55,5 @@ public class ArtifactoryServiceImpl implements ArtifactoryService {
 		return twoMostlyDownloadedArtifacts;
 
 	}
-	
-	public static void main(String[] args) throws Exception{
-		InputStream is =  Thread.currentThread().getContextClassLoader().getResourceAsStream("application.properties");
-		Properties properties = new Properties();
-		properties.load(is);
-		String p = properties.getProperty("SEARCH_URL");
-		String l = properties.getProperty("STATS_URL");
-		System.out.println("P: " + p + " l: " + l);
-	}
 
 }

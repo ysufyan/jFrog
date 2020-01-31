@@ -9,41 +9,38 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Properties;
 
-import javax.ejb.Stateless;
 import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+
+import org.jboss.resteasy.spi.ApplicationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.yasir.assessment.service.dto.ArtifactDTO;
 import com.yasir.assessment.service.dto.ArtifactSearchDTO;
 import com.yasir.assessment.service.dto.ArtifactStatsDTO;
 
-@Stateless
 public class ArtifactoryClient {
 
-	static String SEARCH_URL;
-	static String STATS_URL;
+	private static String SEARCH_URL;
+	private static String STATS_URL;
 	private static String authHeader;
+	private static Logger LOGGER = LoggerFactory.getLogger(ArtifactoryClient.class);
 
 	static {
 		InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("application.properties");
 		Properties properties = new Properties();
 		try {
 			properties.load(is);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		SEARCH_URL = properties.getProperty("SEARCH_URL");
-		STATS_URL = properties.getProperty("STATS_URL");
-
-		try {
+			SEARCH_URL = properties.getProperty("SEARCH_URL");
+			STATS_URL = properties.getProperty("STATS_URL");
 			authHeader = (String) new InitialContext().lookup("java:global/auth");
-		} catch (NamingException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			LOGGER.error("Message: " + e.getMessage() + " Cause: " + e.getCause());
+			throw new ApplicationException(e);
 		}
-
 	}
 
 	public ArtifactSearchDTO searchAllArtifacts(final String repo) {
@@ -60,12 +57,16 @@ public class ArtifactoryClient {
 			searchResult = gson.fromJson(response.body(), ArtifactSearchDTO.class);
 
 		} catch (URISyntaxException e) {
-			e.printStackTrace();
+			LOGGER.error("Message: " + e.getMessage() + " Cause: " + e.getCause());
+			throw new ApplicationException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.error("Message: " + e.getMessage() + " Cause: " + e.getCause());
+			throw new ApplicationException(e);
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			LOGGER.error("Message: " + e.getMessage() + " Cause: " + e.getCause());
+			throw new ApplicationException(e);
 		}
+
 		return searchResult;
 
 	}
@@ -82,13 +83,18 @@ public class ArtifactoryClient {
 			Gson gson = new Gson();
 			artifactStatsDTO = gson.fromJson(response.body(), ArtifactStatsDTO.class);
 		} catch (URISyntaxException e) {
-			e.printStackTrace();
+			LOGGER.error("Message: " + e.getMessage() + " Cause: " + e.getCause());
+			throw new ApplicationException(e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.error("Message: " + e.getMessage() + " Cause: " + e.getCause());
+			throw new ApplicationException(e);
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			LOGGER.error("Message: " + e.getMessage() + " Cause: " + e.getCause());
+			throw new ApplicationException(e);
 		}
+
 		return artifactStatsDTO;
+
 	}
 
 }
