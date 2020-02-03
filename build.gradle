@@ -10,13 +10,6 @@ repositories {
   	mavenCentral()
 }
 
-repositories {
-    jcenter()
-  }
-  dependencies {
-    classpath "org.jfrog.buildinfo:build-info-extractor-gradle:latest.release"
-  }
-
 dependencies {
 	providedCompile 'jakarta.platform:jakarta.jakartaee-api:8.0.0'
 	providedCompile group: 'org.jboss.resteasy', name: 'resteasy-multipart-provider', version: '4.4.1.Final'
