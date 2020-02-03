@@ -6,8 +6,16 @@ plugins {
 
 repositories {
 	// I was not able to figure out how to use jFactory Orbitera instance.
-    mavenCentral()
+	// http://35.238.219.235/artifactory/libs-releases , gives 404. So I used mavenCentral
+  	mavenCentral()
 }
+
+repositories {
+    jcenter()
+  }
+  dependencies {
+    classpath "org.jfrog.buildinfo:build-info-extractor-gradle:latest.release"
+  }
 
 dependencies {
 	providedCompile 'jakarta.platform:jakarta.jakartaee-api:8.0.0'
